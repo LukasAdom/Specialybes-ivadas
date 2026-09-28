@@ -2,6 +2,12 @@
 #include <utility> // for pair
 #include <math.h> // for hypot
 #include <cstdlib> // for exit
+#include <cstdint>
+#include <uchar.h>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <map>
 
 using namespace std;
 
@@ -14,7 +20,15 @@ enum Directions {
     SOUTH
 };
 
-void movePair(pair<size_t, size_t>& position, Directions direction, u_int distance) {
+// This is a char case-insensitive function, which takes 2 chars, lowers and compares them.
+bool checkch(char& ch1, char& ch2){
+        if(char(tolower(ch1)) != char(tolower(ch2))){
+            return false;
+        }
+    return true;
+}
+
+void movePair(pair<size_t, size_t>& position, Directions direction, uint16_t distance) {
     switch (direction){
     case NORTH:
         if (position.second - distance < mapSize.first) {
@@ -53,41 +67,53 @@ void movePair(pair<size_t, size_t>& position, Directions direction, u_int distan
     }
 }
 
-pair<Directions, u_int> printAllOptions(){
+pair<Directions, uint16_t> printAllOptions(){
     char direction;
-    u_int distance;
+    uint16_t distance;
+    char quit = 'Q';
+    uint8_t counter = 0;
+
+    char distancestate[] = {'N','W','E','S'};
+    string stringdist[] = {"NORTH","WEST","EAST","SOUTH"};
+
     cout << "State movement direction (N|W|E|S) + the amount to move or (Q) to quit: ";
     cin >> direction;
-    Directions parsedDirection;
-    switch (direction)
-    {
-    case 'N':
-    case 'n':
-        parsedDirection = NORTH;
-        break;
-    case 'W':
-    case 'w':
-        parsedDirection = WEST;
-        break;
-    case 'E':
-    case 'e':
-        parsedDirection = EAST;
-        break;
-    case 'S':
-    case 's':
-        parsedDirection = SOUTH;
-        break;
-    case 'Q':
-    case 'q':
+    Directions parsedDirection;   
+    
+    // This creates a map for the enums, since you cannot iterate through enums.
+
+    struct directionMap : public map<string, Directions>{
+        directionMap(){
+            this->operator[]("NORTH") = NORTH;
+            this->operator[]("WEST") = WEST;
+            this->operator[]("EAST") = EAST;
+            this->operator[]("SOUTH") = SOUTH;
+        };
+        ~directionMap(){}
+    };
+    
+    if(checkch(direction, quit)){
         throw runtime_error("exit case used");
-        break;
-    default:
-        // make this quit the program
-        cout << "Invalid direction" << endl;
-        return {NORTH, 0};
     }
+
+    // By mapping the enums you could create an array of strings then bind them,
+    // thus allowing you to iterate through them.
+    // Instead of having to use tons of switch cases.
+
+    for(uint8_t i = 0u; i<stringdist->length();i++){        
+        if(checkch(direction, distancestate[i])){
+            parsedDirection = directionMap()[stringdist[i]];
+        } else {
+            counter += 1;
+            if (counter >= stringdist->length()){
+                    cout << "Invalid direction" << endl;
+                return {NORTH, 0};
+            }
+        }
+    }
+    
     cin >> distance;
-    pair<Directions, u_int> move = {parsedDirection, distance};
+    pair<Directions, uint16_t> move = {parsedDirection, distance};
     return move;
 }
 
@@ -120,7 +146,7 @@ int main() {
             }
             cout << endl;
         }
-        pair<Directions, u_int> move;
+        pair<Directions, uint16_t> move;
         try {
             move = printAllOptions();
         }
