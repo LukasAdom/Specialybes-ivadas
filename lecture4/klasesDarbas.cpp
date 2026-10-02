@@ -99,7 +99,7 @@ pair<Directions, uint16_t> printAllOptions(){
         if(checkch(direction, distancestate[i])){
             parsedDirection = directionMap.at(stringdist[i]);
         } else {
-            counter += 1;
+            counter += 1u;
             if (counter >= stringdist->length()){
                     cout << "Invalid direction" << endl;
                 return {NORTH, 0};
@@ -119,7 +119,7 @@ int main() {
 
     double distanceToGoal = -1;
     // main game cycle
-    while (true) {
+    for(;;) {
         if(player == goal){
             cout << "YOU WIN!!" << endl;
             break;
@@ -149,7 +149,6 @@ int main() {
         }
         movePair(player, move.first, move.second);
         distanceToGoal = hypot(goal.first - player.first, goal.second - player.second);
-        cout << distanceToGoal << endl;
     }
     return 0;
 }
