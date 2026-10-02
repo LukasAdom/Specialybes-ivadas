@@ -90,11 +90,8 @@ pair<Directions, uint16_t> printAllOptions(){
     if(checkch(direction, quit)){
         throw runtime_error("exit case used");
     }
-
-    // By mapping the enums you could create an array of strings then bind them,
-    // thus allowing you to iterate through them.
-    // Instead of having to use tons of switch cases.
-
+    
+    // By mapping the enums you could create an array of strings then bind them.
     for(uint8_t i = 0u; i<stringdist->length();i++){        
         if(checkch(direction, distancestate[i])){
             parsedDirection = directionMap.at(stringdist[i]);
