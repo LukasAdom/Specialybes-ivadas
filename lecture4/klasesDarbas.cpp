@@ -3,21 +3,31 @@
 #include <math.h> // for hypot
 #include <cstdlib> // for exit
 #include <cstdint>
-#include <uchar.h>
 #include <string>
-#include <algorithm>
-#include <cmath>
-#include <map>
+#include <unordered_map>
 
 using namespace std;
 
+char quit = 'Q';
+
 pair<int, int> mapSize = {10, 10}; // .first -> y .second -> x
+    pair<size_t, size_t> player = {0, 0};
+    pair<size_t, size_t> goal = {9, 9};
+    char distancestate[] = {'N','W','E','S'};
+    string stringdist[] = {"NORTH","WEST","EAST","SOUTH"};
 
 enum Directions {
     NORTH,
     WEST,
     EAST,
     SOUTH
+};
+
+inline static const unordered_map<string, Directions> directionMap = {
+        {"NORTH", NORTH},
+        {"WEST", WEST},
+        {"EAST", EAST},
+        {"SOUTH", SOUTH}
 };
 
 // This is a char case-insensitive function, which takes 2 chars, lowers and compares them.
@@ -70,27 +80,12 @@ void movePair(pair<size_t, size_t>& position, Directions direction, uint16_t dis
 pair<Directions, uint16_t> printAllOptions(){
     char direction;
     uint16_t distance;
-    char quit = 'Q';
     uint8_t counter = 0;
 
-    char distancestate[] = {'N','W','E','S'};
-    string stringdist[] = {"NORTH","WEST","EAST","SOUTH"};
 
     cout << "State movement direction (N|W|E|S) + the amount to move or (Q) to quit: ";
     cin >> direction;
     Directions parsedDirection;   
-    
-    // This creates a map for the enums, since you cannot iterate through enums.
-
-    struct directionMap : public map<string, Directions>{
-        directionMap(){
-            this->operator[]("NORTH") = NORTH;
-            this->operator[]("WEST") = WEST;
-            this->operator[]("EAST") = EAST;
-            this->operator[]("SOUTH") = SOUTH;
-        };
-        ~directionMap(){}
-    };
     
     if(checkch(direction, quit)){
         throw runtime_error("exit case used");
@@ -102,7 +97,7 @@ pair<Directions, uint16_t> printAllOptions(){
 
     for(uint8_t i = 0u; i<stringdist->length();i++){        
         if(checkch(direction, distancestate[i])){
-            parsedDirection = directionMap()[stringdist[i]];
+            parsedDirection = directionMap.at(stringdist[i]);
         } else {
             counter += 1;
             if (counter >= stringdist->length()){
@@ -121,8 +116,7 @@ int main() {
     string sPlayer = " @ ";
     string sGoal = " X ";
     string sEmpty = " * ";
-    pair<size_t, size_t> player = {0, 0};
-    pair<size_t, size_t> goal = {9, 9};
+
     double distanceToGoal = -1;
     // main game cycle
     while (true) {
